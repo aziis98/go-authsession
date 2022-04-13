@@ -19,13 +19,13 @@ func (f HttpOptionFunc) SetHttpOption(h *HttpAuth) {
 	f(h)
 }
 
-func WithNotAuthorizedHandler(notAuthorizedHandler http.Handler) HttpOption {
+func WithNotAuthorizedHandler(notAuthorizedHandler http.Handler) authsession.Option {
 	return HttpOptionFunc(func(ha *HttpAuth) {
 		ha.NotAuthorizedHandler = notAuthorizedHandler
 	})
 }
 
-func WithErrorHandler(errorHandler func(error) http.Handler) HttpOption {
+func WithErrorHandler(errorHandler func(error) http.Handler) authsession.Option {
 	return HttpOptionFunc(func(ha *HttpAuth) {
 		ha.ErrorHandler = errorHandler
 	})

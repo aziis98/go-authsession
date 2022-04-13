@@ -45,6 +45,7 @@ func TestLogin(t *testing.T) {
 		loginHandler := func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != http.MethodPost {
 				w.WriteHeader(http.StatusNotFound)
+				t.Fatal()
 				return
 			}
 
@@ -53,11 +54,13 @@ func TestLogin(t *testing.T) {
 
 			if err := auth.Login(w, username, password); err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
+				t.Fatal(err)
 				return
 			}
 
 			if err := json.NewEncoder(w).Encode("ok"); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
+				t.Fatal(err)
 				return
 			}
 		}
@@ -81,13 +84,13 @@ func TestLogin(t *testing.T) {
 		logoutHandler := func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != http.MethodPost {
 				w.WriteHeader(http.StatusNotFound)
+				t.Fatal()
 				return
 			}
 
 			if err := auth.Logout(w, r); err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
 				t.Fatal(err)
-				w.Write([]byte(err.Error()))
-				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
 		}
@@ -106,8 +109,3 @@ func TestLogin(t *testing.T) {
 		t.Log(res.Result().Cookies())
 	})
 }
-
-// func TestLogout(t *testing.T) {
-// 	auth := setupAuthSessionService()
-
-// }

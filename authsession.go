@@ -7,6 +7,9 @@ import (
 )
 
 var (
+	// ErrUserNotFound should be raised when a credential checker is called with a non-existant user
+	ErrUserNotFound = errors.New(`user not found`)
+
 	// ErrNotAuthorized is raised when a user tries to access a resource it is not supposed to
 	ErrNotAuthorized = errors.New(`not authorized`)
 
@@ -23,8 +26,9 @@ type Base struct {
 	sessionStore session.Store
 }
 
-func (s *Base) Login(userId string, password string) (string, error) {
-	ok, err := s.credChecker.CheckCredentials(userId, password)
+// Login the given user if the provided credentials are correct this returns a new session token associated with this user.
+func (b *Base) Login(userId string, password string) (string, error) {
+	ok, err := b.credChecker.CheckCredentials(userId, password)
 	if err != nil {
 		return "", err
 	}
@@ -32,7 +36,7 @@ func (s *Base) Login(userId string, password string) (string, error) {
 		return "", ErrNotAuthorized
 	}
 
-	sid, err := s.sessionStore.CreateSession(userId)
+	sid, err := b.sessionStore.CreateSession(userId)
 	if err != nil {
 		return "", err
 	}
@@ -40,39 +44,28 @@ func (s *Base) Login(userId string, password string) (string, error) {
 	return sid, nil
 }
 
-func (s *Base) HasPermissions(userId string, required []string) (bool, error) {
-	if s.permChecker == nil {
-		panic(ErrNoPermissionChecker)
-	}
-
-	ok, err := s.permChecker.HasPermissions(userId, required)
-	if err != nil {
-		return false, err
-	}
-
-	return ok, nil
-}
-
-func (s *Base) IsLogged(sessionId string) (bool, error) {
+// Logout deletes the given session if still valid.
+func (b *Base) Logout(sessionId string) error {
 	// shortcut for passing directly the cookie value from http framework of choice
 	if sessionId == "" {
-		return false, nil
+		return session.ErrSessionNotFound
 	}
 
-	if _, err := s.sessionStore.UserForSession(sessionId); err != nil {
-		return false, err
+	if err := b.sessionStore.DeleteSession(sessionId); err != nil {
+		return err
 	}
 
-	return true, nil
+	return nil
 }
 
-func (service *Base) UserForSession(sessionId string) (string, error) {
+// UserForSession retrieves the user associated with this session.
+func (b *Base) UserForSession(sessionId string) (string, error) {
 	// shortcut for passing directly the cookie value from http framework of choice
 	if sessionId == "" {
 		return "", session.ErrSessionNotFound
 	}
 
-	userId, err := service.sessionStore.UserForSession(sessionId)
+	userId, err := b.sessionStore.UserForSession(sessionId)
 	if err != nil {
 		return "", err
 	}
@@ -80,15 +73,24 @@ func (service *Base) UserForSession(sessionId string) (string, error) {
 	return userId, nil
 }
 
-func (service *Base) Logout(sessionId string) error {
-	// shortcut for passing directly the cookie value from http framework of choice
-	if sessionId == "" {
-		return session.ErrSessionNotFound
+// IsLogged returns true if the given session is valid and associated with a user
+func (b *Base) IsLogged(sessionId string) (bool, error) {
+	if _, err := b.sessionStore.UserForSession(sessionId); err != nil {
+		return false, err
 	}
 
-	if err := service.sessionStore.DeleteSession(sessionId); err != nil {
-		return err
+	return true, nil
+}
+
+func (b *Base) HasPermissions(userId string, required []string) (bool, error) {
+	if b.permChecker == nil {
+		panic(ErrNoPermissionChecker)
 	}
 
-	return nil
+	ok, err := b.permChecker.HasPermissions(userId, required)
+	if err != nil {
+		return false, err
+	}
+
+	return ok, nil
 }
