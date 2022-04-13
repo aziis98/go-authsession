@@ -2,14 +2,16 @@ package authsession
 
 import "time"
 
-var DefaultConfig = ServiceConfig{
-	CookieName:     "sid",
-	CookiePath:     "/",
-	CookieDuration: 7 * 24 * time.Hour,
+func NewDefaultConfig() *CookieConfig {
+	return &CookieConfig{
+		Name:     "sid",
+		Path:     "/",
+		Duration: 7 * 24 * time.Hour,
+	}
 }
 
-type ServiceConfig struct {
-	CookieName     string
-	CookiePath     string
-	CookieDuration time.Duration
+type CookieConfig struct {
+	Name     string
+	Path     string
+	Duration time.Duration
 }
