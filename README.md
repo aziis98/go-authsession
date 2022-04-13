@@ -4,9 +4,9 @@ A library to easily handle cookie sessions and a basic form of permission manage
 
 For now this supports
 
--   [`net/http`](https://pkg.go.dev/net/http) using the submodule [`httpauth`](./httpauth)
+-   [`net/http`](https://pkg.go.dev/net/http) using the submodule [`httpauth`](./httpauth).
 
--   [`fiber`](https://github.com/gofiber/fiber) using the submodule [`fiberauth`](./fiberauth)
+-   [`fiber`](https://github.com/gofiber/fiber) using the submodule [`fiberauth`](./fiberauth).
 
 ## Usage
 
@@ -25,7 +25,7 @@ func (_ *exampleAuth) CheckCredentials(userId string, password string) (bool, er
 }
 ```
 
-We can now use directly `authsession.New(CredentialChecker, ...Option)` to create an instance of `*authsession.Base` that provides the following methods.
+We can now use directly `authsession.New(CredentialChecker, ...Option)` to create an instance of `*authsession.Base` that provides the following methods
 
 -   `(*Base).Login(userId string, password string) (string, error)`
 
@@ -61,20 +61,20 @@ The http adapter can be created using `httpauth.New(CredentialChecker, ...Option
 auth := httpauth.New(&exampleAuth{})
 ```
 
-Otherwise this can take two optional arguments for setting up error handlers used by the middleware methods.
+Otherwise this can take some optional arguments for setting up error handlers used by the _middleware methods_ as shown later.
 
--   `httpauth.WithNotAuthorizedHandler(notAuthorizedHandler http.Handler) Option`
+-   `WithNotAuthorizedHandler(notAuthorizedHandler http.Handler) Option`
 
     Special HTTP error handler for unauthorized access.
 
--   `httpauth.WithErrorHandler(errorHandler func(error) http.Handler) Option`
+-   `WithErrorHandler(errorHandler func(error) http.Handler) Option`
 
     Generic HTTP error handler.
 
-For example to login in a user you can just define an http handler as follows
+For example to login a user you can just define an http handler as follows
 
 ```go
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
         w.WriteHeader(http.StatusNotFound)
         return
@@ -92,15 +92,16 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
-}
+})
 ```
 
 Lastly if you are using a `net/http` based router you can use one of the following middlewares
 
 ```go
+// by having the route accept only logged in users...
 router.Use(auth.LoggedMiddleware())
 
-// or...
+// ...or by having the route require a list of permissions
 router.Use(auth.PermissionsMiddleware([]string{ "moderator" }))
 ```
 
@@ -110,7 +111,7 @@ router.Use(auth.PermissionsMiddleware([]string{ "moderator" }))
 
 The submodule [`fiberauth`](./fiberauth) provides an adapter working with the [`fiber`](https://github.com/gofiber/fiber) web framework. Let's use the `exampleAuth` struct from before.
 
-...
+TODO: Add an example
 
 (for now see [fiberauth/auth.go](./fiberauth/auth.go))
 
@@ -118,4 +119,4 @@ The submodule [`fiberauth`](./fiberauth) provides an adapter working with the [`
 
 -   [ ] Add token "refresh"-ability to `session.Store`.
 
--   [ ] Add a test to `fiberauth`.
+-   [ ] Add some tests to `fiberauth`.
