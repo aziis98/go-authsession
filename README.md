@@ -1,5 +1,13 @@
 # AuthSession
 
+A library to easily handle cookie sessions and a basic form of permission management with go http frameworks and libraries.
+
+For now this supports
+
+-   [`net/http`](https://pkg.go.dev/net/http) using the submodule [`httpauth`](./httpauth)
+
+-   [`fiber`](https://github.com/gofiber/fiber) using the submodule [`fiberauth`](./fiberauth)
+
 ## Usage
 
 First we need something implementing the `authsession.CredentialChecker` interface.
@@ -95,6 +103,8 @@ router.Use(auth.LoggedMiddleware())
 // or...
 router.Use(auth.PermissionsMiddleware([]string{ "moderator" }))
 ```
+
+(for a complete example see [httpauth/auth_test.go](./httpauth/auth_test.go))
 
 ### Fiber Auth
 
