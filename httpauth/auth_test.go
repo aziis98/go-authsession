@@ -32,7 +32,7 @@ func (_ *exampleAuth) HasPermissions(id string, required []string) (bool, error)
 		return true, nil
 	}
 
-	return false, authsession.ErrNotAuthorized
+	return false, authsession.ErrUnauthorized
 }
 
 var _ authsession.CredentialPermissionChecker = &exampleAuth{}

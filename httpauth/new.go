@@ -40,7 +40,7 @@ func defaultErrorHandler(err error) http.Handler {
 func New(credChecker authsession.CredentialChecker, opts ...authsession.Option) *HttpAuth {
 	httpAuth := &HttpAuth{}
 	httpAuth.errorHandler = defaultErrorHandler
-	httpAuth.unauthorizedHandler = defaultErrorHandler(authsession.ErrNotAuthorized)
+	httpAuth.unauthorizedHandler = defaultErrorHandler(authsession.ErrUnauthorized)
 
 	basicOpts := []authsession.Option{}
 	for _, opt := range opts {

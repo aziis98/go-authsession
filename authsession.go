@@ -10,8 +10,8 @@ var (
 	// ErrUserNotFound should be raised when a credential checker is called with a non-existant user
 	ErrUserNotFound = errors.New(`user not found`)
 
-	// ErrNotAuthorized is raised when a user tries to access a resource it is not supposed to
-	ErrNotAuthorized = errors.New(`not authorized`)
+	// ErrUnauthorized is raised when a user tries to access a resource it is not supposed to
+	ErrUnauthorized = errors.New(`not authorized`)
 
 	// ErrNoPermissionChecker is raised when one tries to use "(*Basic).HasPermissions()" on an instance without a valid PermissionChecker
 	ErrNoPermissionChecker = errors.New(`no permission checker`)
@@ -33,7 +33,7 @@ func (b *Base) Login(userId string, password string) (string, error) {
 		return "", err
 	}
 	if !ok {
-		return "", ErrNotAuthorized
+		return "", ErrUnauthorized
 	}
 
 	sid, err := b.sessionStore.CreateSession(userId)

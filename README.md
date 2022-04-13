@@ -63,7 +63,7 @@ auth := httpauth.New(&exampleAuth{})
 
 Otherwise this can take some optional arguments for setting up error handlers used by the _middleware methods_ as shown later.
 
--   `WithNotAuthorizedHandler(notAuthorizedHandler http.Handler) Option`
+-   `WithUnauthorizedHandler(unauthorizedHandler http.Handler) Option`
 
     Special HTTP error handler for unauthorized access.
 

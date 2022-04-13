@@ -89,7 +89,7 @@ func (fa *FiberAuth) LoggedMiddleware() fiber.Handler {
 		}
 
 		if !logged {
-			return authsession.ErrNotAuthorized
+			return authsession.ErrUnauthorized
 		}
 
 		return c.Next()
@@ -109,7 +109,7 @@ func (fa *FiberAuth) PermissionsMiddleware(required []string) fiber.Handler {
 		}
 
 		if !ok {
-			return authsession.ErrNotAuthorized
+			return authsession.ErrUnauthorized
 		}
 
 		return c.Next()
