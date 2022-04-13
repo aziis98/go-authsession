@@ -10,8 +10,8 @@ import (
 type HttpAuth struct {
 	basic *authsession.Base
 
-	NotAuthorizedHandler http.Handler
-	ErrorHandler         func(error) http.Handler
+	unauthorizedHandler http.Handler
+	errorHandler        func(error) http.Handler
 }
 
 func (h *HttpAuth) cookie(r *http.Request) (string, error) {
@@ -85,12 +85,12 @@ func (h *HttpAuth) LoggedMiddleware() func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			logged, err := h.IsLogged(r)
 			if err != nil {
-				h.ErrorHandler(err).ServeHTTP(w, r)
+				h.errorHandler(err).ServeHTTP(w, r)
 				return
 			}
 
 			if !logged {
-				h.NotAuthorizedHandler.ServeHTTP(w, r)
+				h.unauthorizedHandler.ServeHTTP(w, r)
 				return
 			}
 
@@ -104,24 +104,24 @@ func (h *HttpAuth) PermissionsMiddleware(required []string) func(http.Handler) h
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			sid, err := h.cookie(r)
 			if err != nil {
-				h.ErrorHandler(err).ServeHTTP(w, r)
+				h.errorHandler(err).ServeHTTP(w, r)
 				return
 			}
 
 			userId, err := h.basic.UserForSession(sid)
 			if err != nil {
-				h.ErrorHandler(err).ServeHTTP(w, r)
+				h.errorHandler(err).ServeHTTP(w, r)
 				return
 			}
 
 			ok, err := h.basic.HasPermissions(userId, required)
 			if err != nil {
-				h.ErrorHandler(err).ServeHTTP(w, r)
+				h.errorHandler(err).ServeHTTP(w, r)
 				return
 			}
 
 			if !ok {
-				h.NotAuthorizedHandler.ServeHTTP(w, r)
+				h.unauthorizedHandler.ServeHTTP(w, r)
 				return
 			}
 

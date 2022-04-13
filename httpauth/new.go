@@ -19,15 +19,15 @@ func (f HttpOptionFunc) SetHttpOption(h *HttpAuth) {
 	f(h)
 }
 
-func WithNotAuthorizedHandler(notAuthorizedHandler http.Handler) authsession.Option {
+func WithUnauthorizedHandler(unauthorizedHandler http.Handler) authsession.Option {
 	return HttpOptionFunc(func(ha *HttpAuth) {
-		ha.NotAuthorizedHandler = notAuthorizedHandler
+		ha.unauthorizedHandler = unauthorizedHandler
 	})
 }
 
 func WithErrorHandler(errorHandler func(error) http.Handler) authsession.Option {
 	return HttpOptionFunc(func(ha *HttpAuth) {
-		ha.ErrorHandler = errorHandler
+		ha.errorHandler = errorHandler
 	})
 }
 
@@ -39,8 +39,8 @@ func defaultErrorHandler(err error) http.Handler {
 
 func New(credChecker authsession.CredentialChecker, opts ...authsession.Option) *HttpAuth {
 	httpAuth := &HttpAuth{}
-	httpAuth.ErrorHandler = defaultErrorHandler
-	httpAuth.NotAuthorizedHandler = defaultErrorHandler(authsession.ErrNotAuthorized)
+	httpAuth.errorHandler = defaultErrorHandler
+	httpAuth.unauthorizedHandler = defaultErrorHandler(authsession.ErrNotAuthorized)
 
 	basicOpts := []authsession.Option{}
 	for _, opt := range opts {
