@@ -45,7 +45,7 @@ Otherwise instead of using `*authsession.Base` directly you can use one of the f
 
 ### Http Auth
 
-The submodule [`httpauth`](./httpauth) provides an adapter working with the `http` module. Let's use the `exampleAuth` struct from before.
+The submodule [`httpauth`](./httpauth) provides an adapter working with the `net/http` module. Let's use the `exampleAuth` struct from before.
 
 The http adapter can be created using `httpauth.New(CredentialChecker, ...Option)`. The simplest form to initialize it is the following
 
@@ -98,8 +98,14 @@ router.Use(auth.PermissionsMiddleware([]string{ "moderator" }))
 
 ### Fiber Auth
 
-The submodule [`fiberauth`](./fiberauth) provides an adapter working with the `fiber` web framework. Let's use the `exampleAuth` struct from before.
+The submodule [`fiberauth`](./fiberauth) provides an adapter working with the [`fiber`](https://github.com/gofiber/fiber) web framework. Let's use the `exampleAuth` struct from before.
 
 ...
 
 (for now see [fiberauth/auth.go](./fiberauth/auth.go))
+
+## TODOs
+
+-   [ ] Add token "refresh"-ability to `session.Store`.
+
+-   [ ] Add a test to `fiberauth`.
